@@ -97,9 +97,7 @@ module.exports = {
         };
       } catch (error) {
         console.log(error)
-        if(error.errors[0].domain === "usageLimits") {
-          return message.channel.send("Your YT API limit is over and it will be restored under 24 hours")
-        }
+       return message.channel.send("Something went wrong!!")
       }
     }
 
@@ -113,8 +111,7 @@ module.exports = {
       embed.setAuthor("Added New Song To Queue", client.user.displayAvatarURL())
       embed.setDescription(`**[${song.title}](${song.url})**`)
       embed.setThumbnail(song.thumbnail)
-      .setFooter("Likes - " + songData.videoDetails.likes + ", Dislikes - " +  songData.videoDetails.dislikes)
-      
+    
       return serverQueue.textChannel
         .send(embed)
         .catch(console.error);
