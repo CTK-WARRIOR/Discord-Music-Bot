@@ -1,5 +1,5 @@
 //I WILL BE BACK AFTER 5 min
-const ytdlDiscord = require("ytdl-core-discord");
+const ytdl = require('ytdl-core');
 const { MessageEmbed } = require("discord.js")
 const { QUEUE_LIMIT, COLOR } = require("../config.json");
 
@@ -19,7 +19,7 @@ let embed = new MessageEmbed()
     }
 
     try {
-      var stream = await ytdlDiscord(song.url, {
+      var stream = await ytdl(song.url, {
         highWaterMark: 1 << 25
       });
     } catch (error) {
@@ -36,7 +36,7 @@ let embed = new MessageEmbed()
     }
 
     const dispatcher = queue.connection
-      .play(stream, { type: "opus" })
+      .play(stream)
       .on("finish", () => {
         if (queue.loop) {
           let lastsong = queue.songs.shift();
