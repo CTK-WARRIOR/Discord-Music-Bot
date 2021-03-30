@@ -8,7 +8,7 @@ module.exports = {
     const { channel } = message.member.voice;
     if (!channel) {
       embed.setAuthor("YOU ARE NOT IN VOICE CHANNEL");
-      return message.channe.send(embed);
+      return message.channel.send(embed);
     }
 
     const serverQueue = client.queue.get(message.guild.id);
