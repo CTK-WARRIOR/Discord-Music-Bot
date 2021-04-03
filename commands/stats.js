@@ -7,7 +7,6 @@ module.exports = {
   name: "stats",
   description: "Get the detailed information of bot",
   execute(client, message, args) {
-    console.log(client.queue.size)
     let embed = new MessageEmbed()
     .setColor(COLOR)
     .setThumbnail(client.user.displayAvatarURL())
@@ -20,7 +19,6 @@ module.exports = {
     .addField("STATUS", client.user.presence.status, true)
     .addField("TOTAL MEMBERS", client.users.cache.size, true)
     .addField("NO. OF GUILD IN BOT IS PLAYING", client.queue.size)
- console.log(client.user.presence)
     message.channel.send(embed)
   }
 };

@@ -33,12 +33,11 @@ module.exports = {
     }
     
     
-    //LETS FIX JUMP COMMAND :D
-  if(serverQueue.songs.length < args[0]) {
+  if(serverQueue.songs.length < parseInt(args[0])) {
     embed.setAuthor("Unable To Find This Song in Queue")
     return message.channel.send(embed)  
-                                         }
-    serverQueue.songs.splice(0, Math.floor(parseInt(args[0]) - 1))
+  }
+    serverQueue.songs.splice(Math.floor(parseInt(args[0]) - 1), 1)
     serverQueue.connection.dispatcher.end()
     
     embed.setDescription(`JUMPED TO THE SONG NUMBER - ${args[0]}`)

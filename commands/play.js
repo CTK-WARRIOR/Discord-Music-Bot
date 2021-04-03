@@ -1,20 +1,15 @@
 const { MessageEmbed } = require("discord.js")
-
-const ms = require("ms")
-
-
 const { Util } = require("discord.js");
-const { YOUTUBE_API_KEY, QUEUE_LIMIT, COLOR } = require("../config.json");
-const ytdl = require("ytdl-core");
-const YoutubeAPI = require("simple-youtube-api");
-const youtube = new YoutubeAPI(YOUTUBE_API_KEY);
+const { QUEUE_LIMIT, COLOR } = require("../config.json");
+const ytsr = require('ytsr');
 const { play } = require("../system/music.js");
+
 module.exports = {
   name: "play",
   description: "Play the song and feel the music",
   async execute(client, message, args) {
     let embed = new MessageEmbed()
-.setColor(COLOR);
+      .setColor(COLOR);
 
 
     //FIRST OF ALL WE WILL ADD ERROR MESSAGE AND PERMISSION MESSSAGE
@@ -25,7 +20,7 @@ module.exports = {
     }
 
     const { channel } = message.member.voice;
-        
+
     if (!channel) {
       //IF AUTHOR IS NOT IN VOICE CHANNEL
       embed.setAuthor("YOU NEED TO BE IN VOICE CHANNEL :/")
@@ -55,7 +50,7 @@ module.exports = {
       volume: 100,
       playing: true
     };
-    
+
     const voteConstruct = {
       vote: 0,
       voters: []
@@ -66,13 +61,18 @@ module.exports = {
 
     if (urlcheck) {
       try {
-        songData = await ytdl.getInfo(args[0]);
-      
+           const result = await ytsr(args[0], {page: 1})
+        songData = result.items[0]
+
         song = {
-             title: songData.videoDetails.title,
-          url: songData.videoDetails.video_url,
-          duration: songData.videoDetails.lengthSeconds,
-          thumbnail: songData.videoDetails.thumbnail.thumbnails[3].url
+          title: songData.title,
+          url: songData.url,
+          duration: songData.duration,
+          thumbnail: songData.bestThumbnail.url,
+          avatar: songData.author.bestAvatar.url,
+          description: songData.description,
+          author: songData.author.name,
+          date: songData.uploadedAt
         };
       } catch (error) {
         if (message.include === "copyright") {
@@ -84,34 +84,39 @@ module.exports = {
         }
       }
     } else {
-          
+
       try {
-        const result = await youtube.searchVideos(targetsong, 1);
-        songData = await ytdl.getInfo(result[0].url);
-      
+        const result = await ytsr(targetsong, { pages: 1 })
+        songData = result.items[0]
+
         song = {
-          title: songData.videoDetails.title,
-          url: songData.videoDetails.video_url,
-          duration: songData.videoDetails.lengthSeconds,
-          thumbnail: songData.videoDetails.thumbnail.thumbnails[3].url,
+          title: songData.title,
+          url: songData.url,
+          duration: songData.duration,
+          thumbnail: songData.bestThumbnail.url,
+          avatar: songData.author.bestAvatar.url,
+          description: songData.description,
+          author: songData.author.name,
+          date: songData.uploadedAt
         };
+
       } catch (error) {
         console.log(error)
-       return message.channel.send("Something went wrong!!")
+        return message.channel.send("Something went wrong!!")
       }
     }
 
     if (serverQueue) {
-        if(serverQueue.songs.length > Math.floor(QUEUE_LIMIT - 1) && QUEUE_LIMIT !== 0) {
-      return message.channel.send(`You can not add songs more than ${QUEUE_LIMIT} in queue`)
-    }
-      
-    
+      if (serverQueue.songs.length > Math.floor(QUEUE_LIMIT - 1) && QUEUE_LIMIT !== 0) {
+        return message.channel.send(`You can not add songs more than ${QUEUE_LIMIT} in queue`)
+      }
+
+
       serverQueue.songs.push(song);
       embed.setAuthor("Added New Song To Queue", client.user.displayAvatarURL())
       embed.setDescription(`**[${song.title}](${song.url})**`)
-      embed.setThumbnail(song.thumbnail)
-    
+      embed.setThumbnail(song.thumbnail);
+
       return serverQueue.textChannel
         .send(embed)
         .catch(console.error);
@@ -121,7 +126,7 @@ module.exports = {
 
     if (!serverQueue)
       message.client.queue.set(message.guild.id, queueConstruct);
-       message.client.vote.set(message.guild.id, voteConstruct);
+    message.client.vote.set(message.guild.id, voteConstruct);
     if (!serverQueue) {
       try {
         queueConstruct.connection = await channel.join();

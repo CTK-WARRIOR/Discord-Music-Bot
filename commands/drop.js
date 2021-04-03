@@ -23,13 +23,12 @@ module.exports = {
       return message.channel.send(embed)
     }
    
-    if(args[0] > serverQueue.songs.length) {
+    if(parseInt(args[0]) > serverQueue.songs.length) {
       embed.setAuthor("Unable to find this song")
       return message.channel.send(embed)
     }
     
-    
-    serverQueue.songs.splice(args[0] - 1, 1)
+    serverQueue.songs.splice(parseInt(args[0]) - 1, 1)
     embed.setDescription("DROPED THE SONG FROM QUEUE")
     embed.setThumbnail(client.user.displayAvatarURL())
     return message.channel.send(embed)

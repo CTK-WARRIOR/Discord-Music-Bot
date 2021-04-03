@@ -6,8 +6,8 @@ const { QUEUE_LIMIT, COLOR } = require("../config.json");
 module.exports = {
   async play(song, message) {
     const queue = message.client.queue.get(message.guild.id);
-let embed = new MessageEmbed()
-.setColor(COLOR);
+    let embed = new MessageEmbed()
+      .setColor(COLOR);
 
     if (!song) {
       queue.channel.leave();
@@ -48,11 +48,14 @@ let embed = new MessageEmbed()
         }
       })
       .on("error", console.error);
-  
+
     dispatcher.setVolumeLogarithmic(queue.volume / 100); //VOLUME
-embed.setAuthor("Started Playing Song", message.client.user.displayAvatarURL())
-    .setDescription(`**[${song.title}](${song.url})**`)
-    
+    embed.setAuthor("Started Playing Song", message.client.user.displayAvatarURL())
+      .setDescription(`**[${song.title}](${song.url})**\n${song.description}`)
+      .setImage(song.thumbnail)
+      .setThumbnail(song.avatar)
+      .setFooter(`${song.author} | ${song.duration}m | ${song.date}`)
+
     queue.textChannel
       .send(embed)
       .catch(err => message.channel.send("UNABLE TO PLAY SONG"));
